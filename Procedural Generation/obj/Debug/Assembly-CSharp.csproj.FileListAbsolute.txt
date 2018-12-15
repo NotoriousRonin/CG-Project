@@ -1,0 +1,2 @@
+C:\Users\Tony\Documents\GitHub\CG-Project\Procedural Generation\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+C:\Users\Tony\Documents\GitHub\CG-Project\Procedural Generation\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache

@@ -22,8 +22,8 @@ public class TerrainGenerator : MonoBehaviour
 
     TerrainData GenerateTerrain(TerrainData terrainData, GenerateHeightmap heightMapData)
     {
-        terrainData.heightmapResolution = heightMapData.width + 1;
-        terrainData.size = new Vector3(heightMapData.width, heightMapData.mountainHeight, heightMapData.length);
+        terrainData.heightmapResolution = (int)terrainData.bounds.size.x + 1;
+        terrainData.size = new Vector3(terrainData.bounds.size.x, heightMapData.mountainHeight, terrainData.bounds.size.z);
         terrainData.SetHeights(0, 0, heightMapData.heightmap);
         return terrainData;
     }
