@@ -22,7 +22,7 @@ public class NoiseMapController : MonoBehaviour {
     /// <summary>
     /// Frequency of Noise
     /// </summary>
-    public float noiseFrequency = 8f;
+    public float noiseFrequency = 2f;
 
     /// <summary>
     /// Number of Octaves to be added
@@ -50,6 +50,16 @@ public class NoiseMapController : MonoBehaviour {
     public bool autoUpdate = false;
 
     /// <summary>
+    /// All Types of Terrains in the Map
+    /// </summary>
+    public TerrainType[] terrains;
+
+    /// <summary>
+    /// Checks if Biome should be added to Map
+    /// </summary>
+    public bool biome = false;
+
+    /// <summary>
     /// Permanent Run
     /// </summary>
     public void Update()
@@ -65,7 +75,7 @@ public class NoiseMapController : MonoBehaviour {
         float[,] heightMap = NoiseMapData.GeneratePerlinHeightMap(mapWidth, mapLength, noiseFrequency, octaveCount, persistance, lacunarity, seed);
 
         NoiseMap2DView view = GetComponent<NoiseMap2DView>();
-        view.DrawTexture(heightMap);
+        view.DrawTexture(heightMap, biome, terrains);
     }
 
     //Setting Methods for UI Controls
@@ -102,5 +112,18 @@ public class NoiseMapController : MonoBehaviour {
     public void setAutoUpdate(bool newAutoUpdate)
     {
         autoUpdate = newAutoUpdate;
+    }
+    
+    public void setBiome(bool newBiome)
+    {
+        biome = newBiome;
+    }
+
+    [System.Serializable]
+    public struct TerrainType
+    {
+        public string name;
+        public float height;
+        public Color color;
     }
 }

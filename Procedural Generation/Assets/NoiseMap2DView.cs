@@ -14,25 +14,45 @@ public class NoiseMap2DView : MonoBehaviour {
     /// </summary>
     /// <param name="heightmap">The Heightmap</param>
     /// <returns>A Texture with each Pixel having a Color depending on their Height</returns>
-    private static Texture2D GenerateTexture(float[,] heightmap)
+    private static Texture2D GenerateTexture(float[,] heightmap, bool biome, NoiseMapController.TerrainType[] terraintypes)
     {
         Texture2D texture = new Texture2D(heightmap.GetLength(0), heightmap.GetLength(1));
         for (int x = 0; x < heightmap.GetLength(0); x++)
         {
-            for (int y = 0; y < heightmap.GetLength(1); y++)
+            if (biome)
             {
-                float height = heightmap[x, y];
-                Color color = new Color(height, height, height);
-                texture.SetPixel(x, y, color);
+                for (int y = 0; y < heightmap.GetLength(1); y++)
+                {
+                    float height = heightmap[x, y];
+                    Color color = Color.white;
+                    for (int i = 0; i < terraintypes.Length; i++)
+                    {
+                        if (height <= terraintypes[i].height)
+                        {
+                            color = terraintypes[i].color;
+                            break;
+                        } 
+                    }
+                    texture.SetPixel(x, y, color);                   
+                }
             }
+            else
+            {
+                for (int y2 = 0; y2 < heightmap.GetLength(1); y2++)
+                {
+                    float height = heightmap[x, y2];
+                    Color color = Color.Lerp(Color.black, Color.white, height);
+                    texture.SetPixel(x, y2, color);
+                }
+            }           
         }
         texture.Apply();
         return texture;
     }
 
-    public void DrawTexture(float[,] heightmap)
+    public void DrawTexture(float[,] heightmap, bool biome, NoiseMapController.TerrainType[] terrainTypes)
     {
-        renderer.material.mainTexture = GenerateTexture(heightmap);
+        renderer.material.mainTexture = GenerateTexture(heightmap, biome, terrainTypes);
         //renderer.transform.localScale = new Vector3(heightmap.GetLength(0), 1, heightmap.GetLength(1));
     }
 }
