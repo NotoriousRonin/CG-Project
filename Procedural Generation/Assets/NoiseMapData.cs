@@ -85,7 +85,7 @@ public static class NoiseMapData{
 
         //Frequency "Zoom" Center
         float xSample = ((float)x * 4 / mapWidth - 2) * noiseFrequency + offsetX;
-        float ySample = ((float)y * 4 / mapLength - 2) * noiseFrequency + offsetX;
+        float ySample = ((float)y * 4 / mapLength - 2) * noiseFrequency + offsetY;
 
         //Multiplying by 2 Minus 1 makes Negative Values
         return (Mathf.PerlinNoise(xSample, ySample) * 2 - 1);

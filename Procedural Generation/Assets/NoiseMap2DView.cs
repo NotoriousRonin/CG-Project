@@ -46,6 +46,12 @@ public class NoiseMap2DView : MonoBehaviour {
                 }
             }           
         }
+        if (biome)
+        {
+            //Makes it easier to look at
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.filterMode = FilterMode.Point;
+        }       
         texture.Apply();
         return texture;
     }
@@ -53,6 +59,5 @@ public class NoiseMap2DView : MonoBehaviour {
     public void DrawTexture(float[,] heightmap, bool biome, NoiseMapController.TerrainType[] terrainTypes)
     {
         renderer.material.mainTexture = GenerateTexture(heightmap, biome, terrainTypes);
-        //renderer.transform.localScale = new Vector3(heightmap.GetLength(0), 1, heightmap.GetLength(1));
     }
 }

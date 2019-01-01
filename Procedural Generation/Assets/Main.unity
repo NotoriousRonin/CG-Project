@@ -1652,19 +1652,37 @@ MonoBehaviour:
   mapWidth: 50
   mapLength: 50
   mountainHeight: 0
-  noiseFrequency: 8
+  noiseFrequency: 1
   octaveCount: 1
   persistance: 0.5
   lacunarity: 2
   seed: 1
   autoUpdate: 0
   terrains:
+  - name: Deep Water
+    height: 0.3
+    color: {r: 0.120149545, g: 0.28402296, b: 0.5660378, a: 1}
   - name: Water
     height: 0.4
-    color: {r: 0.1432894, g: 0.4094809, b: 0.8679245, a: 1}
+    color: {r: 0, g: 0.3309288, b: 0.9150943, a: 1}
+  - name: Shore
+    height: 0.45
+    color: {r: 0.8113208, g: 0.6998459, b: 0.39417946, a: 1}
   - name: Land
+    height: 0.5
+    color: {r: 0.43773732, g: 0.8207547, b: 0.40650585, a: 1}
+  - name: HighLand
+    height: 0.6
+    color: {r: 0.11992703, g: 0.5188679, b: 0.19712305, a: 1}
+  - name: Mountain
+    height: 0.7
+    color: {r: 0.7735849, g: 0.53369516, b: 0.22258809, a: 1}
+  - name: HighMountain
+    height: 0.9
+    color: {r: 0.5188679, g: 0.40219805, b: 0.15419188, a: 1}
+  - name: Snow
     height: 1
-    color: {r: 0.3445632, g: 0.6132076, b: 0.29792634, a: 1}
+    color: {r: 1, g: 1, b: 1, a: 1}
   biome: 0
 --- !u!4 &693847666
 Transform:
@@ -3890,7 +3908,7 @@ MonoBehaviour:
   m_MinValue: 1
   m_MaxValue: 10
   m_WholeNumbers: 0
-  m_Value: 2
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
