@@ -198,7 +198,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setPersistance
+        m_MethodName: SetPersistance
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -608,7 +608,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setBiome
+        m_MethodName: SetBiome
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -775,7 +775,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setLacunarity
+        m_MethodName: SetLacunarity
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -803,7 +803,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &265851994
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1041,7 +1041,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setAutoUpdate
+        m_MethodName: SetAutoUpdate
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1631,6 +1631,7 @@ GameObject:
   - component: {fileID: 693847666}
   - component: {fileID: 693847665}
   - component: {fileID: 693847667}
+  - component: {fileID: 693847668}
   m_Layer: 0
   m_Name: NoiseMapController
   m_TagString: Untagged
@@ -1708,7 +1709,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58bd63fa0b57afc4f8d4af1749444d8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderer: {fileID: 265851994}
+  renderer: {fileID: 808595407}
+--- !u!114 &693847668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 693847664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50eee9ea432d5cd46aa3a6e871bd6360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshfilter: {fileID: 808595408}
 --- !u!1 &703657625
 GameObject:
   m_ObjectHideFlags: 0
@@ -1828,7 +1841,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setOctaveCount
+        m_MethodName: SetOctaveCount
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2005,6 +2018,78 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 785461899}
   m_CullTransparentMesh: 0
+--- !u!1 &808595406
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 808595409}
+  - component: {fileID: 808595408}
+  - component: {fileID: 808595407}
+  m_Layer: 0
+  m_Name: MeshNoiseView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &808595407
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 808595406}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
+  m_Materials:
+  - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &808595408
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 808595406}
+  m_Mesh: {fileID: 0}
+--- !u!4 &808595409
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 808595406}
+  m_LocalRotation: {x: 0.3770277, y: -0, z: -0, w: 0.926202}
+  m_LocalPosition: {x: -233, y: 0, z: -516}
+  m_LocalScale: {x: 4, y: 1, z: 4}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 44.299004, y: 0, z: 0}
 --- !u!1 &842806281
 GameObject:
   m_ObjectHideFlags: 0
@@ -3609,7 +3694,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setMountainHeight
+        m_MethodName: SetMountainHeight
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3913,7 +3998,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setNoiseFrequency
+        m_MethodName: SetNoiseFrequency
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4079,7 +4164,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 693847665}
-        m_MethodName: setSeed
+        m_MethodName: SetSeed
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

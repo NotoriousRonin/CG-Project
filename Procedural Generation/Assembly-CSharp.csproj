@@ -62,9 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\GenerateHeightmap.cs" />
-    <Compile Include="Assets\NoiseMap2DView.cs" />
     <Compile Include="Assets\NoiseMapController.cs" />
     <Compile Include="Assets\NoiseMapData.cs" />
+    <Compile Include="Assets\NoiseMapMeshView.cs" />
+    <Compile Include="Assets\NoiseMapTextureView.cs" />
     <Compile Include="Assets\PostProcessing\Runtime\Attributes\GetSetAttribute.cs" />
     <Compile Include="Assets\PostProcessing\Runtime\Attributes\MinAttribute.cs" />
     <Compile Include="Assets\PostProcessing\Runtime\Attributes\TrackballAttribute.cs" />

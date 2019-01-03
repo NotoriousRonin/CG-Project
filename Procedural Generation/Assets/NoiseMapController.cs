@@ -74,47 +74,47 @@ public class NoiseMapController : MonoBehaviour {
     {
         float[,] heightMap = NoiseMapData.GeneratePerlinHeightMap(mapWidth, mapLength, noiseFrequency, octaveCount, persistance, lacunarity, seed);
 
-        NoiseMap2DView view = GetComponent<NoiseMap2DView>();
+        NoiseMapTextureView view = GetComponent<NoiseMapTextureView>();
         view.DrawTexture(heightMap, biome, terrains);
     }
 
     //Setting Methods for UI Controls
-    public void setMountainHeight(float newMountainHeight) 
+    public void SetMountainHeight(float newMountainHeight) 
     {
         mountainHeight = (int)newMountainHeight;
     }
 
-    public void setNoiseFrequency(float newNoiseFrequency) 
+    public void SetNoiseFrequency(float newNoiseFrequency) 
     {
         noiseFrequency = newNoiseFrequency;
     }
 
-    public void setOctaveCount(float newOctaveCount) 
+    public void SetOctaveCount(float newOctaveCount) 
     {
         octaveCount = (int)newOctaveCount;
     }
     
-    public void setPersistance(float newPersistance) 
+    public void SetPersistance(float newPersistance) 
     {
         persistance = newPersistance;
     }
     
-    public void setLacunarity(float newLacunarity) 
+    public void SetLacunarity(float newLacunarity) 
     {
         lacunarity = newLacunarity;
     }
 
-    public void setSeed(float newSeed)
+    public void SetSeed(float newSeed)
     {
         seed = (int)newSeed;
     }
 
-    public void setAutoUpdate(bool newAutoUpdate)
+    public void SetAutoUpdate(bool newAutoUpdate)
     {
         autoUpdate = newAutoUpdate;
     }
     
-    public void setBiome(bool newBiome)
+    public void SetBiome(bool newBiome)
     {
         biome = newBiome;
     }
