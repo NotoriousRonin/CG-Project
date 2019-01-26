@@ -18,9 +18,9 @@ public class NoiseMap2DView : MonoBehaviour {
     /// </summary>
     /// <param name="heightmap">The Heightmap</param>
     /// <param name="biome">Checks if Biome should be added to the 2DTexture</param>
-    /// <param name="terrainTypes">Struct TerrainType(Name,Color,Height) needed for adding Biome</param>
+    /// <param name="biomeGradient">Depending on the Height[0-1] a certain Color is chosen from the Gradient</param>
     /// <returns>A Texture with each Pixel having a Color depending on their Height</returns>
-    private Texture2D GenerateTexture(float[,] heightmap, bool biome, NoiseMapController.TerrainType[] terraintypes)
+    private Texture2D GenerateTexture(float[,] heightmap, bool biome, Gradient biomeGradient)
     {
         Texture2D texture = new Texture2D(heightmap.GetLength(0), heightmap.GetLength(1));
         for (int x = 0; x < heightmap.GetLength(0); x++)
@@ -30,17 +30,15 @@ public class NoiseMap2DView : MonoBehaviour {
                 for (int y = 0; y < heightmap.GetLength(1); y++)
                 {
                     float height = heightmap[x, y];
-                    Color color = Color.white;             
-                    for (int i = 0; i < terraintypes.Length; i++)
-                    {
-                        if (height <= terraintypes[i].height)
-                        {
-                            color = terraintypes[i].color;
-                            break;
-                        }
-                    }                 
+                    Color color = biomeGradient.Evaluate(height);
                     texture.SetPixel(x, y, color);                   
                 }
+                if (biomeGradient.mode == GradientMode.Blend)
+                {
+                    //Makes it easier to look at
+                    texture.wrapMode = TextureWrapMode.Clamp;
+                    texture.filterMode = FilterMode.Point;
+                }                
             }
             else
             {
@@ -51,13 +49,7 @@ public class NoiseMap2DView : MonoBehaviour {
                     texture.SetPixel(x, y2, color);
                 }             
             }           
-        }
-        if (biome)
-        {
-            //Makes it easier to look at
-            texture.wrapMode = TextureWrapMode.Clamp;
-            texture.filterMode = FilterMode.Point;
-        }       
+        }    
         texture.Apply();
         return texture;
     }
@@ -68,9 +60,9 @@ public class NoiseMap2DView : MonoBehaviour {
     /// <param name="heightmap">The Heightmap</param>
     /// <param name="biome">True if Biome should be added</param>
     /// <param name="terrainTypes">Struct TerrainType(Name,Color,Height) needed for adding Biome</param>
-    public void DrawTexture(float[,] heightmap, bool biome, NoiseMapController.TerrainType[] terrainTypes)
+    public void DrawTexture(float[,] heightmap, bool biome, Gradient biomeGradient)
     {
-        Texture2D texture = GenerateTexture(heightmap, biome, terrainTypes);
+        Texture2D texture = GenerateTexture(heightmap, biome, biomeGradient);
         renderer2D.material.mainTexture = texture;    
     }
 }

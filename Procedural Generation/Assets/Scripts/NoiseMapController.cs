@@ -50,11 +50,6 @@ public class NoiseMapController : MonoBehaviour {
     public bool autoUpdate = false;
 
     /// <summary>
-    /// All Types of Terrains in the Map
-    /// </summary>
-    public TerrainType[] terrains;
-
-    /// <summary>
     /// Checks if Biome should be added to Map
     /// </summary>
     public bool biome = false;
@@ -62,7 +57,7 @@ public class NoiseMapController : MonoBehaviour {
     /// <summary>
     /// Map Color based on Height and Gradient
     /// </summary>
-    public Gradient gradient;
+    public Gradient biomeGradient;
 
     /// <summary>
     /// Gradient to use If no Biome is added
@@ -73,6 +68,16 @@ public class NoiseMapController : MonoBehaviour {
     /// Rather the View is 3D or not (2D)
     /// </summary>
     public bool render3D = false;
+
+    /// <summary>
+    /// Rather multiple Octaves should be added to Noise
+    /// </summary>
+    public bool multipleOctaves = false;
+
+    /// <summary>
+    /// Saves the Octave# Value
+    /// </summary>
+    private int saveOctaveCount;
 
     /// <summary>
     /// 2D Representation of Noise
@@ -119,15 +124,14 @@ public class NoiseMapController : MonoBehaviour {
         float[,] heightMap = NoiseMapData.GeneratePerlinHeightMap(mapWidth, mapLength, noiseFrequency, octaveCount, persistance, lacunarity, seed);
        
         if (render3D)
-        {          
+        {
             NoiseMapMeshView viewMesh = GetComponent<NoiseMapMeshView>();
-            viewMesh.DrawMesh(heightMap, mountainHeight, biome, gradient, defaultGradient);
+            if (biome) viewMesh.DrawMesh(heightMap, mountainHeight, biomeGradient);
+            else viewMesh.DrawMesh(heightMap, mountainHeight, defaultGradient);
         }
-        else
-        {           
-            NoiseMap2DView viewTexture = GetComponent<NoiseMap2DView>();
-            viewTexture.DrawTexture(heightMap, biome, terrains);
-        }       
+            
+        NoiseMap2DView viewTexture = GetComponent<NoiseMap2DView>();
+        viewTexture.DrawTexture(heightMap, biome, biomeGradient);
     }
 
     //Setting Methods for UI Controls
@@ -172,6 +176,21 @@ public class NoiseMapController : MonoBehaviour {
     }
 
     /// <summary>
+    /// Save Octave# before switching multipleOctaves off
+    /// and set Octave# back to when switching multipleOctaves on
+    /// </summary>
+    /// <param name="newMultipleOctaves">Rather multiple Octaves should be added to Noise</param>
+    public void setMultipleOctaves(bool newMultipleOctaves)
+    {
+        if (!newMultipleOctaves)
+        {
+            saveOctaveCount = octaveCount;
+            octaveCount = 1;
+        }
+        else octaveCount = saveOctaveCount;
+    }
+
+    /// <summary>
     /// Switches between Views
     /// </summary>
     /// <param name="newRender3D">Rather the View is a 3D Representation or not</param>
@@ -179,27 +198,17 @@ public class NoiseMapController : MonoBehaviour {
     {
         if (newRender3D)
         {
-            view2D.SetActive(false);
+            view2D.transform.position = new Vector3(710, -22.5f, 60);
+            view2D.transform.localScale = new Vector3(19.5f, 1, 19.5f);
             view3D.SetActive(true);
         }
         else
         {
-            view2D.SetActive(true);
+            view2D.transform.position = new Vector3(447.3f, -22.5f, -206.5f);
+            view2D.transform.localScale = new Vector3(70, 1, 70);
             view3D.SetActive(false);
         }
         render3D = newRender3D;
-    }
-
-    /// <summary>
-    /// TerrainType with Name, Height, Color
-    /// Color of Points will be decided by their Height
-    /// Points.Height smaller or equal to TerrainType.Color results in Point.Color = TerrainType.Color 
-    /// </summary>
-    [System.Serializable]
-    public struct TerrainType
-    {
-        public string name;
-        public float height;
-        public Color color;
+        GenerateView();
     }
 }

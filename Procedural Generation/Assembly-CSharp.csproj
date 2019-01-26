@@ -61,10 +61,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\GradientEditor.cs" />
+    <Compile Include="Assets\Scripts\MoveUIElements.cs" />
     <Compile Include="Assets\Scripts\NoiseMap2DView.cs" />
     <Compile Include="Assets\Scripts\NoiseMapController.cs" />
     <Compile Include="Assets\Scripts\NoiseMapData.cs" />
     <Compile Include="Assets\Scripts\NoiseMapMeshView.cs" />
+    <Compile Include="Assets\Scripts\ToggleMenu.cs" />
     <Reference Include="Unity.RenderPipelines.Core.Editor">
       <HintPath>C:/Users/Tony/Documents/GitHub/CG-Project/Procedural Generation/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
     </Reference>
