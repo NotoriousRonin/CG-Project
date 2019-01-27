@@ -66,9 +66,14 @@ public class GradientEditor : MonoBehaviour
     public InputField inputAlphaHeight;
 
     /// <summary>
-    /// Array of Names selected for the Colors
+    ///  Button for deleting an AlphaKey
     /// </summary>
-    private List<string> colorNames = new List<string>();
+    public Button deleteAlphaKeyButton;
+
+    /// <summary>
+    /// Button for deleting a ColorKey
+    /// </summary>
+    public Button deleteColorKeyButton;
 
     /// <summary>
     /// Needed to provide an Gradient
@@ -80,19 +85,19 @@ public class GradientEditor : MonoBehaviour
     /// </summary>
     private Text colorDropdownLabel;
 
+    /// <summary>
+    /// Label Component of the AlphaKeys Dropdown
+    /// </summary>
+    private Text alphaDropdownLabel;
     //Initialize Controller
     public void Start()
     {
         noiseMapController = GetComponent<NoiseMapController>();
         colorDropdownLabel = colorKeyDropdown.GetComponentInChildren<Text>();
-        //Default Names
-        colorNames.Add("Water");
-        colorNames.Add("Grass");
-        colorNames.Add("Mountain");
-        colorNames.Add("High Mountain");
-        colorNames.Add("Snow");
-        //Show First Biome Color
-        showColorKey(0);
+        alphaDropdownLabel = alphaKeyDropdown.GetComponentInChildren<Text>();
+        showColorKey(0); //Show first Color of the Biome, ColorKeysEditor open by default
+        deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
+        deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
     }
 
     /// <summary>
@@ -108,6 +113,7 @@ public class GradientEditor : MonoBehaviour
             alphaKeyEditor.SetActive(false);
             panelBackground.GetComponent<RectTransform>().offsetMin = new Vector2(panelBackground.GetComponent<RectTransform>().offsetMin.x, -4.949979e-05f);
             showColorKey(0);
+            deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
         }
         else
         {
@@ -115,26 +121,99 @@ public class GradientEditor : MonoBehaviour
             alphaKeyEditor.SetActive(true);
             panelBackground.GetComponent<RectTransform>().offsetMin = new Vector2(panelBackground.GetComponent<RectTransform>().offsetMin.x, 73.175f);
             showAlphaKey(0);
+            deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
         }
     }
 
+    /// <summary>
+    /// Adds a ColorKey to the NoiseMapController.biomeGradient
+    /// </summary>
     public void addColorKey()
     {
-        colorNames.Insert(0,"Unnamed Color Key");
+        List<string> newColorKeyOptions = convertDropdownOptionsToStringList(colorKeyDropdown);
+        newColorKeyOptions.Insert(0,"Unnamed Color Key");
         colorKeyDropdown.ClearOptions();
-        colorKeyDropdown.AddOptions(colorNames);
+        colorKeyDropdown.AddOptions(newColorKeyOptions);
 
-       
+        GradientColorKey[] newGradientColorKeys;
+        copyColorKeys(noiseMapController.biomeGradient.colorKeys, out newGradientColorKeys);
+        newGradientColorKeys[0].color = new Color32(0, 0, 0, 255);
+        newGradientColorKeys[0].time = 0;
+        noiseMapController.biomeGradient.SetKeys(newGradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
+
+        colorKeyDropdown.value = 0;
+        showColorKey(0);
+
+        deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
     }
 
-    public void addAlphaKey() { }
+    /// <summary>
+    /// Adds a AlphaKey to the NoiseMapController.biomeGradient
+    /// </summary>
+    public void addAlphaKey()
+    {
+        List<string> newAlphaKeyOptions = convertDropdownOptionsToStringList(alphaKeyDropdown);
+        newAlphaKeyOptions.Insert(0, "New Key");
+        alphaKeyDropdown.ClearOptions();
+        alphaKeyDropdown.AddOptions(newAlphaKeyOptions);
 
-    public void deleteColorKey() { }
+        GradientAlphaKey[] newGradientAlphaKeys;
+        copyAlphaKeys(noiseMapController.biomeGradient.alphaKeys, out newGradientAlphaKeys);
+        newGradientAlphaKeys[0].alpha = 0;
+        newGradientAlphaKeys[0].time = 0;
+        noiseMapController.biomeGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, newGradientAlphaKeys);
 
-    public void deleteAlphaKey() { }
+        alphaKeyDropdown.value = 0;
+        showAlphaKey(0);
+
+        deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
+    }
 
     /// <summary>
-    /// Update a Color Key
+    /// Deletes the current ColorKey in the ColorKeyDropdown from NoiseMapController.biomeGradient
+    /// </summary>
+    public void deleteColorKey()
+    {
+        int index = colorKeyDropdown.value;
+
+        List<string> newColorKeyOptions = convertDropdownOptionsToStringList(colorKeyDropdown);
+        newColorKeyOptions.RemoveAt(index);
+        colorKeyDropdown.ClearOptions();
+        colorKeyDropdown.AddOptions(newColorKeyOptions);
+
+        GradientColorKey[] newGradientColorKeys = removeColorKey(index, noiseMapController.biomeGradient.colorKeys);
+        noiseMapController.biomeGradient.SetKeys(newGradientColorKeys, noiseMapController.biomeGradient.alphaKeys);       
+
+        colorKeyDropdown.value = index; //index = the key that would have followed after the removed one
+        showColorKey(index);
+
+        deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
+    }
+
+    /// <summary>
+    /// Delete the current AlphaKey in the AlphaKeyDropdown from NoiseMapController.biomeGradient
+    /// </summary>
+    public void deleteAlphaKey()
+    {
+        int index = alphaKeyDropdown.value;
+
+        List<string> newAlphaKeyOptions = convertDropdownOptionsToStringList(alphaKeyDropdown);
+        newAlphaKeyOptions.RemoveAt(index);
+        alphaKeyDropdown.ClearOptions();
+        alphaKeyDropdown.AddOptions(newAlphaKeyOptions);
+
+        GradientAlphaKey[] newGradientAlphaKeys = removeAlphaKey(index, noiseMapController.biomeGradient.alphaKeys);
+        noiseMapController.biomeGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, newGradientAlphaKeys);
+
+        alphaKeyDropdown.value = index; //index = the key that would have followed after the removed one
+        updateAlphaNames();
+        showAlphaKey(index);
+
+        deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
+    }
+
+    /// <summary>
+    /// Update the current ColorKey in the ColorKeyDropdown from the NoiseMapController.biomeGradient
     /// </summary>
     public void updateColorKey()
     {
@@ -201,7 +280,6 @@ public class GradientEditor : MonoBehaviour
             gradientColorKeys[index].time = time;
             noiseMapController.biomeGradient.SetKeys(gradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
             string colorName = inputColorKeyName.text;
-            colorNames[index] = colorName;
             colorDropdownLabel.text = colorName;
             colorKeyDropdown.options[index].text = colorName;
             sortValues(colorKeyDropdown, index, time, "ColorKeys");
@@ -209,7 +287,7 @@ public class GradientEditor : MonoBehaviour
     }
 
     /// <summary>
-    /// Update a AlphaKey
+    /// Update the current AlphaKey in the AlphaKeyDropdown from the NoiseMapController.biomeGradient
     /// </summary>
     public void updateAlphaKey()
     {
@@ -217,7 +295,7 @@ public class GradientEditor : MonoBehaviour
         int alpha;
         float time;
         bool successfullParse = true;
-        int index = colorKeyDropdown.value;
+        int index = alphaKeyDropdown.value;
 
         //Validate Alpha Input
         if (!int.TryParse(inputAlpha.text, out alpha))
@@ -249,7 +327,9 @@ public class GradientEditor : MonoBehaviour
             gradientAlphaKeys[index].alpha = alpha;
             gradientAlphaKeys[index].time = time;
             noiseMapController.biomeGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, gradientAlphaKeys);
-            sortValues(alphaKeyDropdown, index, time, "AlphaKeys");
+            sortValues(alphaKeyDropdown, index, time, "AlphaKeys");            
+            updateAlphaNames();
+            alphaDropdownLabel.text = alphaKeyDropdown.options[alphaKeyDropdown.value].text;
         }
     }
 
@@ -259,7 +339,8 @@ public class GradientEditor : MonoBehaviour
     public void showColorKey(int index)
     {
         Color32 color = noiseMapController.biomeGradient.colorKeys[index].color;
-        inputColorKeyName.text = colorNames[index];
+        List<string> colorKeyOptions = convertDropdownOptionsToStringList(colorKeyDropdown);
+        inputColorKeyName.text = colorKeyOptions[index];
         inputRed.text = "" + color.r;
         inputGreen.text = "" + color.g;
         inputBlue.text = "" + color.b;
@@ -337,20 +418,117 @@ public class GradientEditor : MonoBehaviour
         }
         */
 
-        string newName = colorNames[currentIndex];
-        colorNames.RemoveAt(currentIndex);
-        colorNames.Insert(newIndex, newName);
+        List<string> newOptions = new List<string>();
+        if (keys == "ColorKeys") newOptions = convertDropdownOptionsToStringList(colorKeyDropdown);
+        if (keys == "AlphaKeys") newOptions = convertDropdownOptionsToStringList(alphaKeyDropdown);
+        string newName = newOptions[currentIndex];
+        newOptions.RemoveAt(currentIndex);
+        newOptions.Insert(newIndex, newName);
         dropdown.ClearOptions();
-        dropdown.AddOptions(colorNames);
+        dropdown.AddOptions(newOptions);
         dropdown.value = newIndex;
     }
 
-    private void copyColorKeys(int index,GradientColorKey[] gradientColorKeys, out GradientColorKey[] copy)
+    /// <summary>
+    /// Updates the Dropdown Options after change to the AlphaKeyDropdown
+    /// </summary>
+    private void updateAlphaNames()
     {
-        copy = new GradientColorKey[gradientColorKeys.Length+1];
-        for (int i = index; i < gradientColorKeys.Length; i++)
+        for (int i = 0; i < alphaKeyDropdown.options.Count; i++)
         {
-            copy[i] = gradientColorKeys[i];
+            alphaKeyDropdown.options[i].text = "Alpha Key [" + i + "]";
         }
+    }
+
+    /// <summary>
+    /// Copys the Value from a GradientColorKey[]
+    /// </summary>
+    /// <param name="gradientColorKeys">Values getting copied from</param>
+    /// <param name="copy">Result containing the copied Values, copy[0] is null </param>
+    private void copyColorKeys(GradientColorKey[] gradientColorKeys, out GradientColorKey[] copy)
+    {
+        copy = new GradientColorKey[gradientColorKeys.Length + 1];
+        for (int i = 0; i < gradientColorKeys.Length; i++)
+        {
+            copy[i + 1] = gradientColorKeys[i];
+        }
+    }
+
+    /// <summary>
+    /// Copys the Value from a GradientAlphaKey[]
+    /// </summary>
+    /// <param name="gradientAlphaKeys">Values getting copied from</param>
+    /// <param name="copy">Result containing the copied Values starting at index</param>
+    private void copyAlphaKeys(GradientAlphaKey[] gradientAlphaKeys, out GradientAlphaKey[] copy)
+    {
+        copy = new GradientAlphaKey[gradientAlphaKeys.Length + 1];
+        for (int i = 0; i < gradientAlphaKeys.Length; i++)
+        {
+            copy[i + 1] = gradientAlphaKeys[i];
+        }
+    }
+
+    /// <summary>
+    /// Dropdown Options as a List
+    /// </summary>
+    /// <param name="dropdown">The Dropdown to create a List of</param>
+    /// <returns>AllDropdown Options Text in a List</returns>
+    private List<string> convertDropdownOptionsToStringList(Dropdown dropdown)
+    {
+        List<string> options = new List<string>();
+        for (int i = 0; i < dropdown.options.Count; i++)
+        {
+            options.Add(dropdown.options[i].text);
+        }
+        return options;
+    }
+
+    /// <summary>
+    /// Removes a Key from the GradientColorKey[]
+    /// </summary>
+    /// <param name="index">Index of the Key to be removed</param>
+    /// <param name="gradientColorKeys">GradientColorKeys of a Gradient</param>
+    /// <returns>A GradientColorKey[] with the Key at index removed</returns>
+    private GradientColorKey[] removeColorKey(int index, GradientColorKey[] gradientColorKeys)
+    {
+        GradientColorKey[] newGradientColorKeys = new GradientColorKey[gradientColorKeys.Length - 1];
+        for (int h = 0; h < index; h++)
+        {
+            newGradientColorKeys[h] = gradientColorKeys[h];
+        }
+        for (int i = index; i < gradientColorKeys.Length - 1; i++)
+        {
+            newGradientColorKeys[i] = gradientColorKeys[i + 1];
+        }
+        return newGradientColorKeys;
+    }
+
+    /// <summary>
+    /// Removes a Key from the GradientAlphaKey[]
+    /// </summary>
+    /// <param name="index">Index of the Key to be removed</param>
+    /// <param name="gradientAlphaKeys">GradientAlphaKeys of a Gradient</param>
+    private GradientAlphaKey[] removeAlphaKey(int index, GradientAlphaKey[] gradientAlphaKeys)
+    {
+        GradientAlphaKey[] newGradientAlphaKeys = new GradientAlphaKey[gradientAlphaKeys.Length - 1];
+        for (int h = 0; h < index; h++)
+        {
+            newGradientAlphaKeys[h] = gradientAlphaKeys[h];
+        }
+        for (int i = index; i < gradientAlphaKeys.Length - 1; i++)
+        {
+            newGradientAlphaKeys[i] = gradientAlphaKeys[i + 1];
+        }        
+        return newGradientAlphaKeys;
+    }
+
+    /// <summary>
+    /// Checks if Deleting a Color/Alpha Key is possible
+    /// </summary>
+    /// <param name="dropdown">ColorKeyDropdown if checking for ColorKeys, equivalent for AlphaKeys</param>
+    /// <returns>True if Delete is possible, else false</returns>
+    private bool isDeletePossible(Dropdown dropdown)
+    {
+        return (dropdown.options.Count > 2);
     }
 }
