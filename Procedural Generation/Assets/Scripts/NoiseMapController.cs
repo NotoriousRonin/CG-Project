@@ -77,7 +77,7 @@ public class NoiseMapController : MonoBehaviour {
     /// <summary>
     /// Saves the Octave# Value
     /// </summary>
-    private int saveOctaveCount;
+    private int saveOctaveCount = 2;
 
     /// <summary>
     /// 2D Representation of Noise
@@ -147,7 +147,8 @@ public class NoiseMapController : MonoBehaviour {
 
     public void SetOctaveCount(float newOctaveCount) 
     {
-        octaveCount = (int)newOctaveCount;
+        if (multipleOctaves) octaveCount = (int)newOctaveCount;
+        else saveOctaveCount = (int)newOctaveCount;
     }
     
     public void SetPersistance(float newPersistance) 
@@ -182,12 +183,9 @@ public class NoiseMapController : MonoBehaviour {
     /// <param name="newMultipleOctaves">Rather multiple Octaves should be added to Noise</param>
     public void setMultipleOctaves(bool newMultipleOctaves)
     {
-        if (!newMultipleOctaves)
-        {
-            saveOctaveCount = octaveCount;
-            octaveCount = 1;
-        }
+        if (!newMultipleOctaves) octaveCount = 1;
         else octaveCount = saveOctaveCount;
+        this.multipleOctaves = newMultipleOctaves;
     }
 
     /// <summary>
