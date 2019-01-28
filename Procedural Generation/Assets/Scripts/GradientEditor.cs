@@ -81,6 +81,11 @@ public class GradientEditor : MonoBehaviour
     private NoiseMapController noiseMapController;
 
     /// <summary>
+    /// Needed to create Preview of Color/Gradient
+    /// </summary>
+    private GradientPreview gradientPreview;
+
+    /// <summary>
     /// Label Component of the ColorKeys Dropdown
     /// </summary>
     private Text colorDropdownLabel;
@@ -89,10 +94,12 @@ public class GradientEditor : MonoBehaviour
     /// Label Component of the AlphaKeys Dropdown
     /// </summary>
     private Text alphaDropdownLabel;
+
     //Initialize Controller
     public void Start()
     {
         noiseMapController = GetComponent<NoiseMapController>();
+        gradientPreview = GetComponent<GradientPreview>();
         colorDropdownLabel = colorKeyDropdown.GetComponentInChildren<Text>();
         alphaDropdownLabel = alphaKeyDropdown.GetComponentInChildren<Text>();
         showColorKey(0); //Show first Color of the Biome, ColorKeysEditor open by default
@@ -276,7 +283,8 @@ public class GradientEditor : MonoBehaviour
         //Add if Validation of everything was successful
         if (sucessfullParse)
         {
-            gradientColorKeys[index].color = new Color32(red, green, blue, 255);
+            Color color = new Color32(red, green, blue, 255);
+            gradientColorKeys[index].color = color;
             gradientColorKeys[index].time = time;
             noiseMapController.biomeGradient.SetKeys(gradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
             string colorName = inputColorKeyName.text;
@@ -284,6 +292,8 @@ public class GradientEditor : MonoBehaviour
             colorKeyDropdown.options[index].text = colorName;
             sortValues(colorKeyDropdown, index, time, "ColorKeys");
         }
+
+        
     }
 
     /// <summary>
