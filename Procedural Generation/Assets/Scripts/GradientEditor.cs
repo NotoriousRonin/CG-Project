@@ -16,9 +16,9 @@ public class GradientEditor : MonoBehaviour
     public GameObject alphaKeyEditor;
 
     /// <summary>
-    /// Panel containing both Editor Menus to resize accordingly to active Menu
+    /// Background Panel of BiomePanel
     /// </summary>
-    public GameObject panelBackground;
+    public GameObject panel;
 
     /// <summary>
     /// Dropdown for the Gradient Color Keys
@@ -81,11 +81,6 @@ public class GradientEditor : MonoBehaviour
     private NoiseMapController noiseMapController;
 
     /// <summary>
-    /// Needed to create Preview of Color/Gradient
-    /// </summary>
-    private GradientPreview gradientPreview;
-
-    /// <summary>
     /// Label Component of the ColorKeys Dropdown
     /// </summary>
     private Text colorDropdownLabel;
@@ -95,20 +90,31 @@ public class GradientEditor : MonoBehaviour
     /// </summary>
     private Text alphaDropdownLabel;
 
+    public MeshRenderer colorPreview;
+
+    public MeshRenderer gradientPreviewColorEditor;
+
+    public MeshRenderer gradientViewColorEditor;
+
+    public MeshRenderer gradientPreviewAlphaEditor;
+
+    public MeshRenderer gradientViewAlphaEditor;
+
     //Initialize Controller
     public void Start()
     {
         noiseMapController = GetComponent<NoiseMapController>();
-        gradientPreview = GetComponent<GradientPreview>();
         colorDropdownLabel = colorKeyDropdown.GetComponentInChildren<Text>();
         alphaDropdownLabel = alphaKeyDropdown.GetComponentInChildren<Text>();
         showColorKey(0); //Show first Color of the Biome, ColorKeysEditor open by default
         deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
         deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
+        GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewColorEditor);
+        resizePanel(71f);
     }
 
     /// <summary>
-    /// Depending on the Value given a Editor Window will be opened
+    /// Setup if Editor was changed
     /// Used for Dropdown Menu
     /// </summary>
     /// <param name="value">Value from the Dropdown Value</param>
@@ -116,19 +122,25 @@ public class GradientEditor : MonoBehaviour
     {
         if (value == 0)
         {
+            alphaKeyEditor.GetComponentInChildren<ToggleMenu>().setBoolTrigger(false);
             colorKeyEditor.SetActive(true);
-            alphaKeyEditor.SetActive(false);
-            panelBackground.GetComponent<RectTransform>().offsetMin = new Vector2(panelBackground.GetComponent<RectTransform>().offsetMin.x, -4.949979e-05f);
+            alphaKeyEditor.SetActive(false);           
             showColorKey(0);
             deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
+            GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewColorEditor);
+            //Hardcoding sucks I know! Tried not doing it. Sucked and didn't work making the UI look weird. 
+            resizePanel(71f);
         }
         else
         {
+            colorKeyEditor.GetComponentInChildren<ToggleMenu>().setBoolTrigger(false);
             colorKeyEditor.SetActive(false);
-            alphaKeyEditor.SetActive(true);
-            panelBackground.GetComponent<RectTransform>().offsetMin = new Vector2(panelBackground.GetComponent<RectTransform>().offsetMin.x, 73.175f);
+            alphaKeyEditor.SetActive(true);        
             showAlphaKey(0);
             deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
+            GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewAlphaEditor);
+            //Hardcoding sucks I know! Tried not doing it. Sucked and didn't work making the UI look weird. 
+            resizePanel(155f);
         }
     }
 
@@ -152,6 +164,8 @@ public class GradientEditor : MonoBehaviour
         showColorKey(0);
 
         deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
+
+        GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewColorEditor);
     }
 
     /// <summary>
@@ -174,6 +188,8 @@ public class GradientEditor : MonoBehaviour
         showAlphaKey(0);
 
         deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
+
+        GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewAlphaEditor);
     }
 
     /// <summary>
@@ -195,6 +211,8 @@ public class GradientEditor : MonoBehaviour
         showColorKey(index);
 
         deleteColorKeyButton.interactable = isDeletePossible(colorKeyDropdown);
+
+        GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewColorEditor);
     }
 
     /// <summary>
@@ -217,6 +235,8 @@ public class GradientEditor : MonoBehaviour
         showAlphaKey(index);
 
         deleteAlphaKeyButton.interactable = isDeletePossible(alphaKeyDropdown);
+
+        GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewAlphaEditor);
     }
 
     /// <summary>
@@ -224,14 +244,70 @@ public class GradientEditor : MonoBehaviour
     /// </summary>
     public void updateColorKey()
     {
-        GradientColorKey[] gradientColorKeys = noiseMapController.biomeGradient.colorKeys;
+        //Outputs for Parse
+        GradientColorKey[] gradientColorKeys;
+        int index;
+        float time;
+
+        //Validate Parse
+        bool successfullParse = getColorKeyFromInput(out gradientColorKeys, out index, out time);
+
+        //Add if Validation of everything was successful
+        if (successfullParse)
+        {      
+            noiseMapController.biomeGradient.SetKeys(gradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
+            string colorName = inputColorKeyName.text;
+            colorDropdownLabel.text = colorName;
+            colorKeyDropdown.options[index].text = colorName;
+            sortValues(colorKeyDropdown, index, time, "ColorKeys");
+            GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewColorEditor);
+        }     
+    }
+
+    /// <summary>
+    /// Make a Preview of the Color and the resulting Gradient from InputFields
+    /// </summary>
+    public void previewColorKeyChange()
+    {
+        //Outputs for Parse
+        GradientColorKey[] gradientColorKeys;
+        int index;
+        float time;
+
+        //Validate Parse
+        bool successfullParse = getColorKeyFromInput(out gradientColorKeys, out index, out time);
+
+        if (successfullParse)
+        {
+            //Color Preview
+            Color32 color = gradientColorKeys[index].color;
+            color.a = 255;
+            GradientPreview.setRendererTextureOneColor(color, colorPreview);
+            //Gradient Preview
+            Gradient previewGradient = new Gradient();
+            previewGradient.SetKeys(gradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
+            GradientPreview.setRendererGradientTexture(previewGradient, gradientPreviewColorEditor);
+            //Hardcoding sucks I know! Tried not doing it. Sucked and didn't work while making the UI look weird. 
+            resizePanel(0f);
+        } 
+    }
+
+    /// <summary>
+    /// Create a GradientColorKey[] based on the InputFields
+    /// </summary>
+    /// <param name="gradientColorKeys">Output for GradientColorKey[]</param>
+    /// <param name="index">Output for the Index of that new GradientColorKey</param>
+    /// <param name="time">Output for the Time of that new GradientColorKey</param>
+    /// <returns></returns>
+    private bool getColorKeyFromInput(out GradientColorKey[] gradientColorKeys, out int index, out float time)
+    {
+        gradientColorKeys = noiseMapController.biomeGradient.colorKeys;
         bool sucessfullParse = true;
-        int index = colorKeyDropdown.value;
+        index = colorKeyDropdown.value;
         byte red;
         byte green;
         byte blue;
-        float time;
-        
+
         //Validate Red Input
         if (!byte.TryParse(inputRed.text, out red))
         {
@@ -279,33 +355,74 @@ public class GradientEditor : MonoBehaviour
             inputColorHeight.text = "ERR";
             sucessfullParse = false;
         }
-
-        //Add if Validation of everything was successful
         if (sucessfullParse)
         {
             Color color = new Color32(red, green, blue, 255);
             gradientColorKeys[index].color = color;
             gradientColorKeys[index].time = time;
-            noiseMapController.biomeGradient.SetKeys(gradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
-            string colorName = inputColorKeyName.text;
-            colorDropdownLabel.text = colorName;
-            colorKeyDropdown.options[index].text = colorName;
-            sortValues(colorKeyDropdown, index, time, "ColorKeys");
         }
-
-        
+        return sucessfullParse;
     }
-
     /// <summary>
     /// Update the current AlphaKey in the AlphaKeyDropdown from the NoiseMapController.biomeGradient
     /// </summary>
     public void updateAlphaKey()
     {
-        GradientAlphaKey[] gradientAlphaKeys = noiseMapController.biomeGradient.alphaKeys;
-        int alpha;
+        //Outputs for Parse
+        GradientAlphaKey[] gradientAlphaKeys;
+        int index;
         float time;
+
+        //Validate Parse
+        bool successfullParse = getAlphaKeyFromInput(out gradientAlphaKeys, out index, out time);
+
+        //Add if Validation of everything was successful
+        if (successfullParse)
+        {         
+            noiseMapController.biomeGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, gradientAlphaKeys);
+            sortValues(alphaKeyDropdown, index, time, "AlphaKeys");            
+            updateAlphaNames();
+            alphaDropdownLabel.text = alphaKeyDropdown.options[alphaKeyDropdown.value].text;
+            GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewAlphaEditor);
+        }
+    }
+
+    /// <summary>
+    /// Make a Preview of the Change to the Alpha Key
+    /// </summary>
+    public void previewAlphaKeyChange()
+    {
+        //Outputs for Parse
+        GradientAlphaKey[] gradientAlphaKeys;
+        int index;
+        float time;
+
+        //Validate Parse
+        bool successfullParse = getAlphaKeyFromInput(out gradientAlphaKeys, out index, out time);
+
+        if (successfullParse)
+        {
+            Gradient previewGradient = new Gradient();
+            previewGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, gradientAlphaKeys);
+            GradientPreview.setRendererGradientTexture(previewGradient, gradientPreviewAlphaEditor);
+            //Hardcoding sucks I know! Tried not doing it. Sucked and didn't work making the UI look weird. 
+            resizePanel(89.15f);
+        }
+    }
+
+    /// <summary>
+    /// Create an GradientAlphaKey[] based on the InputFields
+    /// </summary>
+    /// <param name="gradientAlphaKeys">Output for the GradientAlphaKey[]</param>
+    /// <param name="index">Output for the Index of that new GradientAlphaKey</param>
+    /// <param name="time">Output for the Time of that new GradientAlphaKey</param>
+    /// <returns>TRUE if Input to the Inputfields could be parsed</returns>
+    private bool getAlphaKeyFromInput(out GradientAlphaKey[] gradientAlphaKeys, out int index, out float time)
+    {
+        gradientAlphaKeys = noiseMapController.biomeGradient.alphaKeys;
+        int alpha;
         bool successfullParse = true;
-        int index = alphaKeyDropdown.value;
+        index = alphaKeyDropdown.value;
 
         //Validate Alpha Input
         if (!int.TryParse(inputAlpha.text, out alpha))
@@ -331,18 +448,15 @@ public class GradientEditor : MonoBehaviour
             successfullParse = false;
         }
 
-        //Add if Validation of everything was successful
         if (successfullParse)
         {
             gradientAlphaKeys[index].alpha = alpha;
             gradientAlphaKeys[index].time = time;
-            noiseMapController.biomeGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, gradientAlphaKeys);
-            sortValues(alphaKeyDropdown, index, time, "AlphaKeys");            
-            updateAlphaNames();
-            alphaDropdownLabel.text = alphaKeyDropdown.options[alphaKeyDropdown.value].text;
         }
-    }
 
+        //Return rather Parse was successful
+        return successfullParse;
+    }
     /// <summary>
     /// Shows the ColorKey Values in the InputFields
     /// </summary>
@@ -540,5 +654,14 @@ public class GradientEditor : MonoBehaviour
     private bool isDeletePossible(Dropdown dropdown)
     {
         return (dropdown.options.Count > 2);
+    }
+
+    /// <summary>
+    /// Resize Panel based on size given
+    /// </summary>
+    /// <param name="size">The new Size of the Panel</param>
+    public void resizePanel(float size)
+    {
+        panel.GetComponent<RectTransform>().offsetMin = new Vector2(panel.GetComponent<RectTransform>().offsetMin.x, size);
     }
 }

@@ -7,12 +7,12 @@ public class NoiseMapController : MonoBehaviour {
     /// <summary>
     /// The Width of the View to generate a Map for
     /// </summary>
-    public int mapWidth = 256;
+    public const int mapWidth = 256;
 
     /// <summary>
     /// The Length of the View to generate a Map for
     /// </summary>
-    public int mapLength = 256;
+    public const int mapLength = 256;
 
     /// <summary>
     /// Max Height for a Mountain

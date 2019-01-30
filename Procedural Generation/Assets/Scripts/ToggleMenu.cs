@@ -11,11 +11,6 @@ public class ToggleMenu : MonoBehaviour
     public GameObject[] uiElements;
 
     /// <summary>
-    /// Rather the UIElements are active
-    /// </summary>
-    private bool isOpen = false;
-
-    /// <summary>
     /// MoveUI Elements if there is such component
     /// </summary>
     private MoveUIElements moveUIElementsScript;
@@ -47,17 +42,6 @@ public class ToggleMenu : MonoBehaviour
             moveUIElementsScript.setUp(!active);
             moveUIElementsScript.moveUIElements();
         }
-    }
-
-    /// <summary>
-    /// If the Value is above 1 the UI-Elements will be set active
-    /// If the Value equals 1 the UI-Elements will be set inactive
-    /// </summary>
-    /// <param name="trigger">Float Value</param>
-    public void setIntTrigger(float trigger)
-    {
-        if (trigger > 1 && !isOpen) activateMenu(true);
-        if (trigger == 1 && isOpen) activateMenu(false);
     }
 
     /// <summary>
