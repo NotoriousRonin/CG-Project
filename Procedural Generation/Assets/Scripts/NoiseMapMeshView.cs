@@ -34,11 +34,11 @@ public class NoiseMapMeshView : MonoBehaviour {
     /// </summary>
     /// <param name="heightmap">The Heightmap</param>
     /// <param name="maxHeight">The highest Mountain</param>
-    /// <param name="biomeGradient">Depending on the Height[0-1] a certain Color is chosen from the Gradient</param>
-    /// <param name="defaultGradient">Gradient to use If no Biome is added</param>
-    public void DrawMesh(float[,] heightmap, float maxHeight, Gradient gradient)
+    /// <param name="gradient">Depending on the Height[0-1] a certain Color is chosen from the Gradient</param>
+    /// <param name="exponent">Exponent of the Curve (Exponential Function: f(x) = x^exp)</param>
+    public void DrawMesh(float[,] heightmap, float maxHeight, Gradient gradient, float exponent)
     {
-        meshfilter.mesh = CreateMesh(heightmap, maxHeight, gradient);
+        meshfilter.mesh = CreateMesh(heightmap, maxHeight, gradient, exponent);
     }
 
     /// <summary>
@@ -47,8 +47,9 @@ public class NoiseMapMeshView : MonoBehaviour {
     /// <param name="heightmap">The Heightmap</param>
     /// <param name="maxHeight">The highest Mountain</param>
     /// <param name="gradient">Depending on the Height[0-1] a certain Color is chosen from the Gradient</param>
+    /// <param name="exponent">Exponent of the Curve (Exponential Function: f(x) = x^exp)</param>
     /// <returns>A Mesh having the vertices at the given height from heightmap * maxHeight</returns>
-    private Mesh CreateMesh(float[,] heightmap, float maxHeight, Gradient gradient)
+    private Mesh CreateMesh(float[,] heightmap, float maxHeight, Gradient gradient, float exponent)
     {
         Mesh mesh = new Mesh();
         int width = heightmap.GetLength(0);
@@ -63,7 +64,7 @@ public class NoiseMapMeshView : MonoBehaviour {
         {
             for (int x = 0; x < width; x++)
             {
-                float height = heightmap[x, y] * maxHeight;
+                float height = Mathf.Pow(heightmap[x, y], exponent) * maxHeight;
                 vertices[i] = new Vector3(x, height, y);
                 //uvs[i] = new Vector2((float)x / width, (float)y / length);
                 colors[i] = gradient.Evaluate(heightmap[x, y]);

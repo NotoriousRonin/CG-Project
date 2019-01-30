@@ -69,6 +69,8 @@ public class NoiseMapController : MonoBehaviour {
     /// </summary>
     public bool render3D = false;
 
+    public float curveExponent = 1;
+
     /// <summary>
     /// Rather multiple Octaves should be added to Noise
     /// </summary>
@@ -126,8 +128,8 @@ public class NoiseMapController : MonoBehaviour {
         if (render3D)
         {
             NoiseMapMeshView viewMesh = GetComponent<NoiseMapMeshView>();
-            if (biome) viewMesh.DrawMesh(heightMap, mountainHeight, biomeGradient);
-            else viewMesh.DrawMesh(heightMap, mountainHeight, defaultGradient);
+            if (biome) viewMesh.DrawMesh(heightMap, mountainHeight, biomeGradient, curveExponent);
+            else viewMesh.DrawMesh(heightMap, mountainHeight, defaultGradient, curveExponent);
         }
             
         NoiseMap2DView viewTexture = GetComponent<NoiseMap2DView>();
@@ -176,6 +178,11 @@ public class NoiseMapController : MonoBehaviour {
         biome = newBiome;
     }
 
+    public void setCurveExponent(float exp)
+    {
+        curveExponent = exp;
+    }
+
     /// <summary>
     /// Save Octave# before switching multipleOctaves off
     /// and set Octave# back to when switching multipleOctaves on
@@ -183,7 +190,11 @@ public class NoiseMapController : MonoBehaviour {
     /// <param name="newMultipleOctaves">Rather multiple Octaves should be added to Noise</param>
     public void setMultipleOctaves(bool newMultipleOctaves)
     {
-        if (!newMultipleOctaves) octaveCount = 1;
+        if (!newMultipleOctaves)
+        {
+            saveOctaveCount = octaveCount;
+            octaveCount = 1;
+        } 
         else octaveCount = saveOctaveCount;
         this.multipleOctaves = newMultipleOctaves;
     }
@@ -208,5 +219,5 @@ public class NoiseMapController : MonoBehaviour {
         }
         render3D = newRender3D;
         GenerateView();
-    }
+    }    
 }
