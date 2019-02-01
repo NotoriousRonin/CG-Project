@@ -250,16 +250,18 @@ public class GradientEditor : MonoBehaviour
         float time;
 
         //Validate Parse
-        bool successfullParse = getColorKeyFromInput(out gradientColorKeys, out index, out time);
+        bool successfullParse = getColorKeysFromInput(out gradientColorKeys, out index, out time);
 
         //Add if Validation of everything was successful
         if (successfullParse)
-        {      
+        {   
+            //Update the Gradient
             noiseMapController.biomeGradient.SetKeys(gradientColorKeys, noiseMapController.biomeGradient.alphaKeys);
+            //Update Dropdown
             string colorName = inputColorKeyName.text;
-            colorDropdownLabel.text = colorName;
-            colorKeyDropdown.options[index].text = colorName;
             sortValues(colorKeyDropdown, index, time, "ColorKeys");
+            colorDropdownLabel.text = colorName;
+            //Update GradientView
             GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewColorEditor);
         }     
     }
@@ -275,7 +277,7 @@ public class GradientEditor : MonoBehaviour
         float time;
 
         //Validate Parse
-        bool successfullParse = getColorKeyFromInput(out gradientColorKeys, out index, out time);
+        bool successfullParse = getColorKeysFromInput(out gradientColorKeys, out index, out time);
 
         if (successfullParse)
         {
@@ -299,7 +301,7 @@ public class GradientEditor : MonoBehaviour
     /// <param name="index">Output for the Index of that new GradientColorKey</param>
     /// <param name="time">Output for the Time of that new GradientColorKey</param>
     /// <returns></returns>
-    private bool getColorKeyFromInput(out GradientColorKey[] gradientColorKeys, out int index, out float time)
+    private bool getColorKeysFromInput(out GradientColorKey[] gradientColorKeys, out int index, out float time)
     {
         gradientColorKeys = noiseMapController.biomeGradient.colorKeys;
         bool sucessfullParse = true;
@@ -374,15 +376,18 @@ public class GradientEditor : MonoBehaviour
         float time;
 
         //Validate Parse
-        bool successfullParse = getAlphaKeyFromInput(out gradientAlphaKeys, out index, out time);
+        bool successfullParse = getAlphaKeysFromInput(out gradientAlphaKeys, out index, out time);
 
         //Add if Validation of everything was successful
         if (successfullParse)
-        {         
+        {       
+            //Update Gradient
             noiseMapController.biomeGradient.SetKeys(noiseMapController.biomeGradient.colorKeys, gradientAlphaKeys);
+            //Update Dropdown
             sortValues(alphaKeyDropdown, index, time, "AlphaKeys");            
             updateAlphaNames();
             alphaDropdownLabel.text = alphaKeyDropdown.options[alphaKeyDropdown.value].text;
+            //Update GradientView
             GradientPreview.setRendererGradientTexture(noiseMapController.biomeGradient, gradientViewAlphaEditor);
         }
     }
@@ -398,7 +403,7 @@ public class GradientEditor : MonoBehaviour
         float time;
 
         //Validate Parse
-        bool successfullParse = getAlphaKeyFromInput(out gradientAlphaKeys, out index, out time);
+        bool successfullParse = getAlphaKeysFromInput(out gradientAlphaKeys, out index, out time);
 
         if (successfullParse)
         {
@@ -417,7 +422,7 @@ public class GradientEditor : MonoBehaviour
     /// <param name="index">Output for the Index of that new GradientAlphaKey</param>
     /// <param name="time">Output for the Time of that new GradientAlphaKey</param>
     /// <returns>TRUE if Input to the Inputfields could be parsed</returns>
-    private bool getAlphaKeyFromInput(out GradientAlphaKey[] gradientAlphaKeys, out int index, out float time)
+    private bool getAlphaKeysFromInput(out GradientAlphaKey[] gradientAlphaKeys, out int index, out float time)
     {
         gradientAlphaKeys = noiseMapController.biomeGradient.alphaKeys;
         int alpha;
@@ -498,7 +503,10 @@ public class GradientEditor : MonoBehaviour
             GradientColorKey[] gradientColorKeys = noiseMapController.biomeGradient.colorKeys;
             for (newIndex = 0; newIndex < gradientColorKeys.Length; newIndex++)
             {
-                if (gradientColorKeys[newIndex].time > time) break;
+                //Not Rounding causes an Error in the comparison due Float Value
+                float timeInGradient = (float)System.Math.Round(gradientColorKeys[newIndex].time, 2);
+                time = (float)System.Math.Round(time, 3);
+                if (time <= timeInGradient) break;
             }
             if (newIndex == gradientColorKeys.Length) newIndex--;
         }
@@ -507,7 +515,10 @@ public class GradientEditor : MonoBehaviour
             GradientAlphaKey[] gradientAlphaKeys = noiseMapController.biomeGradient.alphaKeys;
             for (newIndex = 0; newIndex < gradientAlphaKeys.Length; newIndex++)
             {
-                if (gradientAlphaKeys[newIndex].time > time) break;
+                //Not Rounding causes an Error in the comparison due Float Value
+                float timeInGradient = (float)System.Math.Round(gradientAlphaKeys[newIndex].time, 2);
+                time = (float)System.Math.Round(time, 2);
+                if (time <= timeInGradient) break;
             }
             if (newIndex == gradientAlphaKeys.Length) newIndex--;
         }
@@ -541,16 +552,18 @@ public class GradientEditor : MonoBehaviour
             colorNames[newIndex + 1] = save;
         }
         */
-
-        List<string> newOptions = new List<string>();
-        if (keys == "ColorKeys") newOptions = convertDropdownOptionsToStringList(colorKeyDropdown);
-        if (keys == "AlphaKeys") newOptions = convertDropdownOptionsToStringList(alphaKeyDropdown);
-        string newName = newOptions[currentIndex];
-        newOptions.RemoveAt(currentIndex);
-        newOptions.Insert(newIndex, newName);
-        dropdown.ClearOptions();
-        dropdown.AddOptions(newOptions);
-        dropdown.value = newIndex;
+        if (newIndex != currentIndex)
+        {
+            List<string> newOptions = new List<string>();
+            if (keys == "ColorKeys") newOptions = convertDropdownOptionsToStringList(colorKeyDropdown);
+            if (keys == "AlphaKeys") newOptions = convertDropdownOptionsToStringList(alphaKeyDropdown);
+            string newName = newOptions[currentIndex];
+            newOptions.RemoveAt(currentIndex);
+            newOptions.Insert(newIndex, newName);
+            dropdown.ClearOptions();
+            dropdown.AddOptions(newOptions);
+            dropdown.value = newIndex;
+        }      
     }
 
     /// <summary>
@@ -582,7 +595,7 @@ public class GradientEditor : MonoBehaviour
     /// Copys the Value from a GradientAlphaKey[]
     /// </summary>
     /// <param name="gradientAlphaKeys">Values getting copied from</param>
-    /// <param name="copy">Result containing the copied Values starting at index</param>
+    /// <param name="copy">Result containing the copied Values starting at 1</param>
     private void copyAlphaKeys(GradientAlphaKey[] gradientAlphaKeys, out GradientAlphaKey[] copy)
     {
         copy = new GradientAlphaKey[gradientAlphaKeys.Length + 1];
