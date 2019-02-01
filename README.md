@@ -49,9 +49,8 @@ UI to edit the gradient.
 
 **Note**: 
 
-Unity 2018.3.1 was used. 
-
-Package File was left in for the import of the Lightweight Rendering Pipeline and the ShaderGraph. 
+- Unity 2018.3.1 was used
+- Package File was left in for the import of the Lightweight Rendering Pipeline and the ShaderGraph. 
 
 Lightweight Rendering Pipeline:
 
